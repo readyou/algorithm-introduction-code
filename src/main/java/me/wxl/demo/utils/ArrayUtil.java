@@ -12,6 +12,10 @@ public class ArrayUtil {
     }
 
     public static <T> void printArray(T[] a, String prefix) {
+        if (a == null) {
+            System.out.printf("%s: null\n", prefix);
+            return;
+        }
         System.out.printf("%s: %s\n", prefix, Arrays.stream(a).map(Object::toString).collect(Collectors.joining(", ")));
     }
 

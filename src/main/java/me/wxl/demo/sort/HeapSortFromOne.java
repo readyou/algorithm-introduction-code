@@ -1,5 +1,7 @@
 package me.wxl.demo.sort;
 
+import me.wxl.demo.utils.MockUtil;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -128,7 +130,7 @@ public class HeapSortFromOne<T> {
         HeapSortFromOne<Integer> heap;
 
         for (int i = 2; i <= 11; i++) {
-            data = HeapSort.getInitData(i, true);
+            data = MockUtil.getIntegerArray(i, true);
             heap = new HeapSortFromOne<>(data, Comparator.naturalOrder());
             heap.buildHeap();
             heap.sort();

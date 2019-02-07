@@ -1,7 +1,8 @@
 package me.wxl.demo.sort;
 
+import me.wxl.demo.utils.MockUtil;
+
 import java.util.Comparator;
-import java.util.Random;
 
 import static me.wxl.demo.utils.ArrayUtil.printArray;
 import static me.wxl.demo.utils.ArrayUtil.swap;
@@ -72,30 +73,9 @@ public class HeapSort<T> {
         heapSort.sort();
     }
 
-    public static Integer[] getInitData(int n, boolean skipFirst) {
-        if (n < 1) {
-            throw new IllegalArgumentException("n不能小于1");
-        }
-        Integer[] result = new Integer[n];
-        for (int i = 0; i < n; i++) {
-            result[i] = i;
-        }
-        if (n > 1) {
-            Random random = new Random();
-            for (int i = skipFirst ? 1 : 0; i < n; i++) {
-                int j = skipFirst ? (1 + random.nextInt(n - 1)) : random.nextInt(n);
-                int tmp = result[i];
-                result[i] = result[j];
-                result[j] = tmp;
-            }
-        }
-        printArray(result, "init data");
-        return result;
-    }
-
     public static void main(String[] args) {
         for (int i = 1; i <= 11; i++) {
-            Integer[] data = getInitData(i, false);
+            Integer[] data = MockUtil.getIntegerArray(i, false);
             HeapSort.sort(data, Comparator.naturalOrder());
             printArray(data, "sort  asc");
             HeapSort.sort(data, Comparator.reverseOrder());

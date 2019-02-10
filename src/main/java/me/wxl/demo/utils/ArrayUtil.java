@@ -11,6 +11,14 @@ public class ArrayUtil {
         a[right] = tmp;
     }
 
+    public static void printIntArray(int[] a, String prefix) {
+        if (a == null) {
+            System.out.printf("%s: null\n", prefix);
+            return;
+        }
+        System.out.printf("%s: %s\n", prefix, Arrays.stream(a).boxed().map(Object::toString).collect(Collectors.joining(", ")));
+    }
+
     public static <T> void printArray(T[] a, String prefix) {
         if (a == null) {
             System.out.printf("%s: null\n", prefix);

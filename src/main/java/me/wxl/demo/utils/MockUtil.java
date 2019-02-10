@@ -45,7 +45,7 @@ public class MockUtil {
         return simpleRecords;
     }
 
-    private static <T> void shuffle(T[] data, boolean skipFirst) {
+    public static <T> void shuffle(T[] data, boolean skipFirst) {
         int n = data.length;
         if (n > 1) {
             Random random = new Random();

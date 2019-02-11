@@ -15,7 +15,7 @@ public class LinkQueue<T> {
     }
 
     public boolean isEmpty() {
-        return head.next == tail;
+        return head == tail;
     }
 
     public void enqueue(T data) {
@@ -33,6 +33,9 @@ public class LinkQueue<T> {
         }
         Node node = head.next;
         head.next = node.next;
+        if (node == tail) {
+            tail = head;
+        }
         return (T) node.data;
     }
 
@@ -43,13 +46,15 @@ public class LinkQueue<T> {
 
     public static void main(String[] args) {
         LinkQueue<Integer> queue = new LinkQueue<>();
-        for (int i = 0; i < 5; i++) {
-            queue.enqueue(i);
+        for (int i = 5; i > 0; i--) {
+            for (int j = 0; j < i; j++) {
+                queue.enqueue(j);
+            }
+            while (!queue.isEmpty()) {
+                System.out.printf("%d, ", queue.dequeue());
+            }
+            System.out.println();
         }
-        while (!queue.isEmpty()) {
-            System.out.printf("%d, ", queue.dequeue());
-        }
-        System.out.println();
     }
 
 }

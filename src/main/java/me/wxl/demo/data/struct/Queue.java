@@ -51,18 +51,14 @@ public class Queue<T> {
     public static void main(String[] args) {
         int size = 5;
         Queue<Integer> queue = new Queue<>(size);
-        for (int i = 0; i < size; i++) {
-            queue.enqueue(i);
+        for (int i = size; i > 0; i--) {
+            for (int j = 0; j < i; j++) {
+                queue.enqueue(j);
+            }
+            while (!queue.isEmpty()) {
+                System.out.printf("%d, ", queue.dequeue());
+            }
+            System.out.println();
         }
-        while (!queue.isEmpty()) {
-            System.out.printf("%d, ", queue.dequeue());
-        }
-        for (int i = 0; i < size; i++) {
-            queue.enqueue(i);
-        }
-        while (!queue.isEmpty()) {
-            System.out.printf("%d, ", queue.dequeue());
-        }
-        System.out.println();
     }
 }

@@ -1,6 +1,8 @@
 package me.wxl.demo.utils;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static me.wxl.demo.utils.ArrayUtil.printArray;
 
@@ -117,5 +119,17 @@ public class MockUtil {
             }
             return new SimpleRecord(this.index, this.value);
         }
+    }
+
+    public static void main(String[] args) {
+        // 简单演示一下Map的key不应该变化，因为变化了之后，可以再也找不到Map中存储的对象了。
+        Map<SimpleRecord, Integer> map = new ConcurrentHashMap<>();
+        SimpleRecord record = new SimpleRecord(1, 2);
+        map.put(record, 10);
+        System.out.println(map.get(record));
+        record.setValue(20);
+        System.out.println(map.get(record));
+        record.setValue(2);
+        System.out.println(map.get(record));
     }
 }

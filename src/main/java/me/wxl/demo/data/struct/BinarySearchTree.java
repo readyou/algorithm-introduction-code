@@ -141,9 +141,6 @@ public class BinarySearchTree<T extends Comparable> {
     }
 
     private void replace(Node oldNode, Node newNode) {
-        if (oldNode == null) {
-            throw new IllegalArgumentException("oldNode不能为null");
-        }
         Node parent = oldNode.parent;
         if (parent == null) {
             root = newNode;

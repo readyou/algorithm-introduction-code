@@ -75,7 +75,7 @@ public class HeapSort<T> {
 
     public static void main(String[] args) {
         for (int i = 1; i <= 11; i++) {
-            Integer[] data = MockUtil.getIntegerArray(i, false);
+            Integer[] data = MockUtil.getRandomIntegerArray(i, false);
             HeapSort.sort(data, Comparator.naturalOrder());
             printArray(data, "sort  asc");
             HeapSort.sort(data, Comparator.reverseOrder());

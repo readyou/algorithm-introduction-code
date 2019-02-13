@@ -130,7 +130,7 @@ public class HeapSortFromOne<T> {
         HeapSortFromOne<Integer> heap;
 
         for (int i = 2; i <= 11; i++) {
-            data = MockUtil.getIntegerArray(i, true);
+            data = MockUtil.getRandomIntegerArray(i, true);
             heap = new HeapSortFromOne<>(data, Comparator.naturalOrder());
             heap.buildHeap();
             heap.sort();

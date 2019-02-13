@@ -65,7 +65,7 @@ public class QuickSort<T> {
 
     public static void main(String[] args) {
         for (int i = 1; i <= 11; i++) {
-            Integer[] data = getIntegerArray(i, false);
+            Integer[] data = getRandomIntegerArray(i, false);
             QuickSort.sort(data, Comparator.naturalOrder());
             printArray(data, "sort  asc");
             QuickSort.sort(data, Comparator.reverseOrder());

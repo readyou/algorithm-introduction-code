@@ -18,7 +18,7 @@ public class MockUtil {
      * @param skipFirst 是不不包含第0个元素（因为有时候不包含第0个元素，利于处理）
      * @return
      */
-    public static Integer[] getIntegerArray(int n, boolean skipFirst) {
+    public static Integer[] getRandomIntegerArray(int n, boolean skipFirst) {
         if (n < 1) {
             throw new IllegalArgumentException("n不能小于1");
         }

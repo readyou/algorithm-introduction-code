@@ -26,29 +26,21 @@ public class BinarySearchTree<T extends Comparable> {
         System.out.println();
     }
 
-    public Node min(Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node不能为空");
+    public Node predecessor(Node node) {
+        if (node.left != null) {
+            return max(node.left);
         }
-        while (node.left != null) {
-            node = node.left;
+        Node p = node.parent;
+        while (p != null && p.left == node) {
+            node = p;
+            p = p.parent;
         }
-        return node;
-    }
-
-    public Node max(Node node) {
-        if (node == null) {
-            throw new IllegalArgumentException("node不能为空");
-        }
-        while (node.right != null) {
-            node = node.right;
-        }
-        return node;
+        return p;
     }
 
     public Node successor(Node node) {
         if (node.right != null) {
-            return max(node.right);
+            return min(node.right);
         }
         Node p = node.parent;
         while (p != null && p.right == node) {
@@ -58,17 +50,20 @@ public class BinarySearchTree<T extends Comparable> {
         return p;
     }
 
-    public Node predecessor(Node node) {
-        if (node.left != null) {
-            return min(node.left);
+    private Node min(Node node) {
+        while (node.left != null) {
+            node = node.left;
         }
-        Node p = node.parent;
-        while (p != null && p.left == node) {
-            node = p;
-            p = p.parent;
-        }
-        return p;
+        return node;
     }
+
+    private Node max(Node node) {
+        while (node.right != null) {
+            node = node.right;
+        }
+        return node;
+    }
+
 
     public void insert(T data) {
         Node node = new Node();
@@ -96,7 +91,7 @@ public class BinarySearchTree<T extends Comparable> {
     }
 
     public Node search(T data) {
-        if (root == null) {
+        if (data == null) {
             return null;
         }
         Node node = root;
@@ -183,12 +178,17 @@ public class BinarySearchTree<T extends Comparable> {
         tree.buildTree(a);
         tree.inOrderPrint();
 
-        Node node = tree.search(4);
-        if (node == null) {
-            System.out.println("查找失败");
-        } else {
-            System.out.printf("data: %s, parent: %s, left: %s, right: %s\n", node, node.parent, node.left, node.right);
+        int[] searchKeys = {5, 7};
+        for (int i : searchKeys) {
+            Node node = tree.search(i);
+            if (node == null) {
+                System.out.printf("查找失败: %d\n", i);
+            } else {
+                System.out.printf("data: %s, parent: %s, left: %s, right: %s, predecessor: %s, successor: %s\n",
+                    node, node.parent, node.left, node.right, tree.predecessor(node), tree.successor(node));
+            }
         }
+
         int[] tobeDeleted = {4, 9, 6, 12, 8, 7, 5, 3, 2, 1, 10, 11, 13};
         for (int i : tobeDeleted) {
             tree.delete(i);

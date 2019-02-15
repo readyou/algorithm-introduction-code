@@ -424,8 +424,8 @@ public class RedBlackTree<T extends Comparable> {
     public static void main(String[] args) {
 //        int[] a = {11, 2, 14, 1, 7, 15, 5, 8, 4}; // 算法导论书上的数据示例
         // 构造大批量的随机树，然后再随机删除节点，用来测试代码的正确性。
-        int lenMin = 15;
-        int lenMax = 16;
+        int lenMin = 10;
+        int lenMax = 11;
         int times = 1;
 //        int lenMin = 1;
 //        int lenMax = 30;

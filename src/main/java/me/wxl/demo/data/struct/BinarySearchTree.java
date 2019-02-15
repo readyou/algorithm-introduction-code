@@ -123,18 +123,27 @@ public class BinarySearchTree<T extends Comparable> {
             return true;
         }
         Node successor = min(node.right);
+
+        // 步骤3没有特定顺序，你可以试着随意变换顺序。
+        // 3. 将node.left挂在successor下面。
+        successor.left = node.left;
+        node.left.parent = successor;
+
+        // 1. 处理右结点：步骤1必需在步骤2前面进行，否则successor移动，下面的if判断的结果会变化。
         if (node.right != successor) {
             replace(successor, successor.right);
             node.right.parent = successor;
             successor.right = node.right;
         }
 
+        // 2. 将successor替代node。
         replace(node, successor);
-        successor.left = node.left;
-        node.left.parent = successor;
+
         return true;
     }
 
+    // replace只是把新的结点挂在老结点的父结点下面，老结点脱离了父结点而处于游离状态。
+    // 但新、老结点的左右孩子，都不在本方法中处理，请额外处理。
     private void replace(Node oldNode, Node newNode) {
         Node parent = oldNode.parent;
         if (parent == null) {

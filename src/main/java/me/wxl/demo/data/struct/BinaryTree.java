@@ -7,12 +7,37 @@ package me.wxl.demo.data.struct;
 public class BinaryTree<T> {
     private Node root;
 
+    // 遍历：可以对node做任何你想做的事情，这里我们仅仅打印。
+    private void doSomethingWithNode(Node node) {
+        System.out.printf("%s\t", node.data);
+    }
+
+    // 层序遍历（广度优先遍历）
+    public void layerTraversal() {
+        if (root == null) {
+            return;
+        }
+        // 这里用到自己实现的队列（我会在其他的文章里面详解队列的原理与实现），你可以换成系统自带的。
+        LinkQueue<Node> queue = new LinkQueue<>();
+        queue.enqueue(root);
+        while (!queue.isEmpty()) {
+            Node node = queue.dequeue();
+            doSomethingWithNode(node);
+            if (node.left != null) {
+                queue.enqueue(node.left);
+            }
+            if (node.right != null) {
+                queue.enqueue(node.right);
+            }
+        }
+    }
+
     // 先序遍历
     private void preOrder(Node node) {
         if (node == null) {
             return;
         }
-        System.out.printf("%s\t", node.data);
+        doSomethingWithNode(node);
         preOrder(node.left);
         preOrder(node.right);
     }
@@ -34,11 +59,11 @@ public class BinaryTree<T> {
     }
 
     private void preOrderNonRecursiveHelper(LinkStack<Node> stack, Node node) {
-        System.out.printf("%s\t", node.data);
+        doSomethingWithNode(node);
         stack.push(node);
 
         while ((node = node.left) != null) {
-            System.out.printf("%s\t", node.data);
+            doSomethingWithNode(node);
             stack.push(node);
         }
     }
@@ -49,7 +74,7 @@ public class BinaryTree<T> {
             return;
         }
         inOrder(node.left);
-        System.out.printf("%s\t", node.data);
+        doSomethingWithNode(node);
         inOrder(node.right);
     }
 
@@ -62,7 +87,7 @@ public class BinaryTree<T> {
 
         while (!stack.isEmpty()) {
             Node node = stack.pop();
-            System.out.printf("%s\t", node.data);
+            doSomethingWithNode(node);
 
             Node right = node.right;
             if (right != null) {
@@ -85,7 +110,7 @@ public class BinaryTree<T> {
         }
         postOrder(node.left);
         postOrder(node.right);
-        System.out.printf("%s\t", node.data);
+        doSomethingWithNode(node);
     }
 
     private void postOrderNonRecursive(Node root) {
@@ -101,13 +126,13 @@ public class BinaryTree<T> {
             Node node = stack.pop();
             // 如果右孩子不存在，则不需要进一步处理了，直接输出本节点，然后继续下一次循环。
             if (node.right == null) {
-                System.out.printf("%s\t", node.data);
+                doSomethingWithNode(node);
                 continue;
             }
 
             // 如果是从右子树回退的，则输出本节点，并重置lastRight。
             if (node.right == lastRight) {
-                System.out.printf("%s\t", node.data);
+                doSomethingWithNode(node);
                 lastRight = node;
             } else {
                 // 否则，本节点重新入栈，标记lastRight为右孩子并处理右孩子。
@@ -120,38 +145,22 @@ public class BinaryTree<T> {
         }
     }
 
-    // 层序遍历（广度优先遍历）
-    public void layerPrint() {
-        if (root == null) {
-            return;
-        }
-        LinkQueue<Node> queue = new LinkQueue<>();
-        queue.enqueue(root);
-        while (!queue.isEmpty()) {
-            Node node = queue.dequeue();
-            System.out.printf("%s\t", node.data);
-            if (node.left != null) {
-                queue.enqueue(node.left);
-            }
-            if (node.right != null) {
-                queue.enqueue(node.right);
-            }
-        }
-    }
-
     public void preOrderPrint() {
+        System.out.print("先序遍历：");
 //        preOrder(root);
         preOrderNonRecursive(root);
         System.out.println();
     }
 
     public void inOrderPrint() {
+        System.out.print("中序遍历：");
 //        inOrder(root);
         inOrderNonRecursive(root);
         System.out.println();
     }
 
     public void postOrderPrint() {
+        System.out.print("后序遍历：");
 //        postOrder(root);
         postOrderNonRecursive(root);
         System.out.println();
@@ -198,10 +207,13 @@ public class BinaryTree<T> {
         Integer[] a = {1, 2, 3, 4, 5, 6, 7};
         BinaryTree<Integer> tree = new BinaryTree<>();
         tree.buildTree(a);
+
         tree.preOrderPrint();
         tree.inOrderPrint();
         tree.postOrderPrint();
-        tree.layerPrint();
+
+        System.out.print("层序遍历：");
+        tree.layerTraversal();
         System.out.println();
     }
 }

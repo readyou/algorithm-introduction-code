@@ -246,7 +246,7 @@ public class RedBlackTree<T extends Comparable> {
             node.left.parent = successor;
             successor.left = node.left;
 
-            // 将node的颜色给successor，所以被替换的颜色为successor本来的颜色。
+            // 将node的颜色给successor，所以被替换的颜色为successor原来的颜色。
             replacedColor = successor.color;
             successor.color = node.color;
         }
@@ -424,8 +424,8 @@ public class RedBlackTree<T extends Comparable> {
     public static void main(String[] args) {
 //        int[] a = {11, 2, 14, 1, 7, 15, 5, 8, 4}; // 算法导论书上的数据示例
         // 构造大批量的随机树，然后再随机删除节点，用来测试代码的正确性。
-        int lenMin = 10;
-        int lenMax = 11;
+        int lenMin = 7;
+        int lenMax = 8;
         int times = 1;
 //        int lenMin = 1;
 //        int lenMax = 30;

@@ -98,53 +98,48 @@ public class RedBlackTree<T extends Comparable> {
         insertFixup(node);
     }
 
-    private void insertFixup(Node node) {
-        while (node.parent != nil && node.parent.color == RED) {
-            Node p = node.parent;
+    private void insertFixup(Node x) {
+        while (x.parent != nil && x.parent.color == RED) {
+            Node p = x.parent;
             // 因为父节点为红色，而根节点为黑色，所以父节点肯定不为根，故祖父节点存在，所以这里不需要判断为nil。
-            Node pp = node.parent.parent;
+            Node pp = p.parent;
+            pp.color = RED;
             if (pp.left == p) {
                 Node pb = pp.right;
                 if (pb.color == RED) {
                     insertFixUpStats[0]++;
                     p.color = BLACK;
                     pb.color = BLACK;
-                    pp.color = RED;
-                    node = pp;
-                    continue;
+                    x = pp;
+                } else {
+                    if (p.left != x) {
+                        insertFixUpStats[1]++;
+                        rotateLeft(p);
+                        x = p;
+                        p = x.parent;
+                    }
+                    insertFixUpStats[2]++;
+                    p.color = BLACK;
+                    rotateRight(pp);
                 }
-
-                if (node != p.left) {
-                    insertFixUpStats[1]++;
-                    rotateLeft(p);
-                    node = p;
-                    p = node.parent;
-                }
-                insertFixUpStats[2]++;
-                p.color = BLACK;
-                pp.color = RED;
-                rotateRight(pp);
             } else {
                 Node pb = pp.left;
                 if (pb.color == RED) {
                     insertFixUpStats[0]++;
                     p.color = BLACK;
                     pb.color = BLACK;
-                    pp.color = RED;
-                    node = pp;
-                    continue;
+                    x = pp;
+                } else {
+                    if (p.right != x) {
+                        insertFixUpStats[1]++;
+                        rotateRight(p);
+                        x = p;
+                        p = x.parent;
+                    }
+                    insertFixUpStats[2]++;
+                    p.color = BLACK;
+                    rotateLeft(pp);
                 }
-
-                if (node != p.right) {
-                    insertFixUpStats[1]++;
-                    rotateRight(p);
-                    node = p;
-                    p = node.parent;
-                }
-                insertFixUpStats[2]++;
-                p.color = BLACK;
-                pp.color = RED;
-                rotateLeft(pp);
             }
         }
         root.color = BLACK;
@@ -169,6 +164,7 @@ public class RedBlackTree<T extends Comparable> {
             parent.right = y;
         }
 
+        // 上面两步顺序无关，但x和y互换一定要放在最后。
         y.left = x;
         x.parent = y;
     }
@@ -198,7 +194,7 @@ public class RedBlackTree<T extends Comparable> {
 
     public Node search(T data) {
         if (root == nil) {
-            return null;
+            return nil;
         }
         Node node = root;
         while (node != nil) {
@@ -212,49 +208,47 @@ public class RedBlackTree<T extends Comparable> {
                 node = node.right;
             }
         }
-        return null;
+        return nil;
     }
 
-    public boolean delete(T data) {
-        Node node = search(data);
-        if (node == null) {
+    public boolean delete(T key) {
+        Node x = search(key);
+        if (x == nil) {
             return false;
         }
-        Node replacement = nil;
-        byte replacedColor = node.color;
-
-        if (node.left == nil) {
-            replacement = node.right;
-            replace(node, replacement);
-        } else if (node.right == nil) {
-            replacement = node.left;
-            replace(node, replacement);
+        byte rc = x.color;
+        Node r = nil;
+        if (x.left == nil) {
+            r = x.right;
+            replace(x, r);
+        } else if (x.right == nil) {
+            r = x.left;
+            replace(x, r);
         } else {
-            Node successor = min(node.right);
-            replacement = successor.right;
-            // replacement不是已经是successor的孩子了吗，这里是不是多余了？
-            // 并不是的，因为success.right可能为nil，而nil没有parent或parent指向不正确，需要重新给nil指定parent，否则进行旋转的时候会出错。
-            replacement.parent = successor;
+            Node s = min(x.right);
+            rc = s.color;
+            r = s.right;
+            // r不是已经是s的右孩子了吗，这里是不是多余了？
+            // 并不是的，因为s.right可能为nil，而nil没有parent或parent指向不正确，需要重新把s.right指定s，否则进行旋转的时候会出错。
+            r.parent = s;
 
-            if (successor.parent != node) {
-                replace(successor, replacement);
-                node.right.parent = successor;
-                successor.right = node.right;
+            if (x.right != s) {
+                replace(s, s.right);
+                // 将x.right挂在s下。
+                x.right.parent = s;
+                s.right = x.right;
             }
 
-            replace(node, successor);
-            node.left.parent = successor;
-            successor.left = node.left;
-
-            // 将node的颜色给successor，所以被替换的颜色为successor原来的颜色。
-            replacedColor = successor.color;
-            successor.color = node.color;
+            // s替代x，并将x.left挂在s下面。
+            replace(x, s);
+            s.left = x.left;
+            x.left.parent = s;
+            s.color = x.color;
         }
 
-        if (replacedColor == BLACK) {
-            deleteFixUp(replacement);
+        if (rc == BLACK) {
+            deleteFixUp(r);
         }
-
         return true;
     }
 
@@ -286,75 +280,73 @@ public class RedBlackTree<T extends Comparable> {
         newNode.parent = oldNode.parent;
     }
 
-    private void deleteFixUp(Node node) {
-        while (node != root && node.color == BLACK) {
-            Node parent = node.parent;
-            if (node == parent.left) {
-                Node brother = parent.right;
-                if (brother.color == RED) {
+    private void deleteFixUp(Node r) {
+        while (r.color == BLACK && r != root) {
+            Node p = r.parent;
+            if (r == p.left) {
+                Node b = p.right;
+                // 情况1，处理之后转化为情况2/3/4的一种。
+                if (b.color == RED) {
                     deleteFixUpStats[0]++;
-                    brother.color = BLACK;
-                    parent.color = RED;
-                    rotateLeft(parent);
-                    brother = parent.right;
+                    b.color = BLACK;
+                    p.color = RED;
+                    rotateLeft(p);
+                    b = p.right;
                 }
 
                 // 因为有哨兵nil，所以这里不需要判断brother.left是否存在。
-                if (brother.left.color == BLACK && brother.right.color == BLACK) {
+                if (b.left.color == BLACK && b.right.color == BLACK) {
                     deleteFixUpStats[1]++;
-                    brother.color = RED;
-                    node = parent;
+                    b.color = RED;
+                    r = p;
                 } else {
-                    if (brother.left.color == RED) {
+                    // 情况3转化为情况4
+                    if (b.left.color == RED) {
                         deleteFixUpStats[2]++;
-                        brother.left.color = BLACK;
-                        brother.color = RED;
-                        rotateRight(brother);
-                        brother = parent.right;
+                        b.left.color = BLACK;
+                        b.color = RED;
+                        rotateRight(b);
+                        b = p.right;
                     }
-
                     deleteFixUpStats[3]++;
-                    // 旋转与变色是相互独立的，所以顺序不是固定的，随意就行。不妨把下面这句rotateLeft(parent)换个地方试试。
-//                    rotateLeft(parent);
-                    brother.color = parent.color;
-                    parent.color = BLACK;
-                    brother.right.color = BLACK;
-                    rotateLeft(parent);
-                    node = root;
+                    b.right.color = BLACK;
+                    b.color = p.color;
+                    p.color = BLACK;
+                    rotateLeft(p);
+                    r = root;
                 }
             } else {
-                Node brother = parent.left;
-                if (brother.color == RED) {
+                Node b = p.left;
+                if (b.color == RED) {
                     deleteFixUpStats[0]++;
-                    brother.color = BLACK;
-                    parent.color = RED;
-                    rotateRight(parent);
-                    brother = parent.left;
+                    b.color = BLACK;
+                    p.color = RED;
+                    rotateRight(p);
+                    b = p.left;
                 }
 
-                if (brother.left.color == BLACK && brother.right.color == BLACK) {
+                if (b.left.color == BLACK && b.right.color == BLACK) {
                     deleteFixUpStats[1]++;
-                    brother.color = RED;
-                    node = parent;
+                    b.color = RED;
+                    r = p;
                 } else {
-                    if (brother.right.color == RED) {
+                    if (b.right.color == RED) {
                         deleteFixUpStats[2]++;
-                        brother.right.color = BLACK;
-                        brother.color = RED;
-                        rotateLeft(brother);
-                        brother = parent.left;
+                        b.right.color = BLACK;
+                        b.color = RED;
+                        rotateLeft(b);
+                        b = p.left;
                     }
-
                     deleteFixUpStats[3]++;
-                    brother.color = parent.color;
-                    parent.color = BLACK;
-                    brother.left.color = BLACK;
-                    rotateRight(parent);
-                    node = root;
+                    b.left.color = BLACK;
+                    b.color = p.color;
+                    p.color = BLACK;
+                    rotateRight(p);
+                    r = root;
                 }
             }
         }
-        node.color = BLACK;
+        r.color = BLACK;
     }
 
     // 检验红黑树的性质：1. 根为黑色；2. 没有两个连续红色节点；3. 从根到任何一个叶子节点的黑节点数目（黑高）相等。
@@ -424,12 +416,12 @@ public class RedBlackTree<T extends Comparable> {
     public static void main(String[] args) {
 //        int[] a = {11, 2, 14, 1, 7, 15, 5, 8, 4}; // 算法导论书上的数据示例
         // 构造大批量的随机树，然后再随机删除节点，用来测试代码的正确性。
-        int lenMin = 7;
-        int lenMax = 8;
-        int times = 1;
-//        int lenMin = 1;
-//        int lenMax = 30;
-//        int times = 20;
+//        int lenMin = 7;
+//        int lenMax = 8;
+//        int times = 1;
+        int lenMin = 1;
+        int lenMax = 30;
+        int times = 20;
         for (int i = lenMin; i < lenMax; i++) {
             for (int j = 0; j < times; j++) {
                 Integer[] elements = MockUtil.getRandomIntegerArray(i, false);
@@ -440,10 +432,11 @@ public class RedBlackTree<T extends Comparable> {
                     System.out.printf("\n插入：%d ------------------------------\n", element);
                     tree.inOrderPrint();
                     tree.layerPrint();
+                    tree.validateTreeProperties();
                 }
 
                 MockUtil.shuffle(elements, false);
-//            elements = new Integer[]{10, 3, 5, 1, 11, 9, 12};
+//                elements = new Integer[]{10, 3, 5, 1, 11, 9, 12};
                 for (int element : elements) {
                     tree.delete(element);
                     System.out.printf("\n删除：%d ------------------------------\n", element);
